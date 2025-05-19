@@ -1,0 +1,16 @@
+langchain
+transformers
+torch
+langchain-community
+langchain-huggingface
+faiss-cpu
+sentence-transformers
+huggingface-hub
+pydantic
+werkzeug
+playwright
+motor
+python-jose
+python-dotenv
+fastapi
+uvicorn

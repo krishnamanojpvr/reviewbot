@@ -38,19 +38,7 @@ async def scrape(url):
                 }
                 status_code = 200
 
-            # elif "flipkart" in url:
-            #     flipkart_scraper = FlipkartScraper(page)
-            #     product_details = await flipkart_scraper.get_product_details()
-            #     specs = await flipkart_scraper.get_specifications()
-            #     high = await flipkart_scraper.get_highlights()
-            #     reviews = await flipkart_scraper.get_reviews()
-            #     response = {
-            #         'product_details': product_details,
-            #         'specifications': specs,
-            #         'highlights': high,
-            #         'reviews': reviews
-            #     }
-            #     status_code = 200
+    
 
             else:
                 response = {"error": "Unsupported URL", "success": False}
@@ -60,4 +48,4 @@ async def scrape(url):
             return response, status_code
 
     except Exception as e:
-        return {"error": f"Error occurred: {e}"}, 500
+        return {"error": f"Error occurred in Scraping Data: {e}"}, 500

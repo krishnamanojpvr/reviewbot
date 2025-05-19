@@ -6,8 +6,6 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.3",token=os.getenv("HF_TOKEN"))
-# client = InferenceClient(model="meta-llama/Llama-3.1-8B-Instruct",token=os.getenv("HF_TOKEN"))
 
 def summarize_reviews(reviews: List[str]) -> Dict[str, Union[str, int]]:
     """
@@ -23,6 +21,9 @@ def summarize_reviews(reviews: List[str]) -> Dict[str, Union[str, int]]:
         - review_count: Number of reviews processed
         OR error message if failed
     """
+    # client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.3", token=os.getenv("HF_TOKEN"))
+    # client = InferenceClient(model="meta-llama/Llama-3.1-8B-Instruct",token=os.getenv("HF_TOKEN"))
+    client = InferenceClient(model="HuggingFaceH4/zephyr-7b-beta",token=os.getenv("HF_TOKEN"))
     logger.info(f"Received {len(reviews)} reviews to summarize")
     
     # Input validation
@@ -47,7 +48,6 @@ def summarize_reviews(reviews: List[str]) -> Dict[str, Union[str, int]]:
         {reviews_text}
         
         Summary: [/INST]"""
-        
         output = client.text_generation(
             prompt=prompt,
             max_new_tokens=250,  
@@ -63,7 +63,7 @@ def summarize_reviews(reviews: List[str]) -> Dict[str, Union[str, int]]:
         
         logger.info(f"Successfully generated {word_count}-word summary")
         return {
-            "summary": summary,
+            "summary_text": summary,
             "word_count": word_count,
             "review_count": len(reviews)
         }

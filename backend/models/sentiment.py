@@ -2,19 +2,18 @@ from huggingface_hub import InferenceClient
 from typing import List, Dict
 import os
 
-MODEL_NAME = "cardiffnlp/twitter-roberta-base-sentiment"
-client = InferenceClient(
-    model=MODEL_NAME, token=os.getenv("HF_TOKEN")
-)
 
 
 def analyze_sentiment(reviews: List[str]) -> Dict[str, float]:
     """
     Analyze sentiment via Hugging Face Inference API
     """
+    MODEL_NAME = "cardiffnlp/twitter-roberta-base-sentiment"
+    client = InferenceClient(
+        model=MODEL_NAME, token=os.getenv("HF_TOKEN")
+    )
     results = {"positive": 0, "negative": 0, "neutral": 0, "scores": []}
     MAX_REVIEW_CHARS = 1000
-
     try:
         for review in reviews:
             truncated_review = review[:MAX_REVIEW_CHARS]
@@ -33,11 +32,12 @@ def analyze_sentiment(reviews: List[str]) -> Dict[str, float]:
 
             results["scores"].append(score)
 
-        results["average_score"] = (
+        results["avg_score"] = (
             sum(results["scores"]) /
             len(results["scores"]) if results["scores"] else 0.0
         )
         return results
+    
     except Exception as e:
         print(f"Error in sentiment analysis: {e}")
         return {"error": str(e)}
