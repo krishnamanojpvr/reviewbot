@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from models.query_handler import handle_query
 import re
+import os
 
 
 load_dotenv()
@@ -59,7 +60,7 @@ async def register(request: Request):
 
         await users_collection.insert_one(user.model_dump())
 
-        return {"message": "User registered successfully"}
+        return {"message": "User registered successfully", "success": True}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -82,11 +83,21 @@ async def login(request: Request):
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
         token = create_access_token(user_data["username"])
+        response = []
+        for search in user_data.get("recentSearches", []):
+            response.append({
+                "product_id": search.get("product_id"),
+                "url": search.get("url"),
+                "name": search.get("product_details", {}).get("name"),
+                "image": search.get("product_details", {}).get("image"),
+            })
 
         return {
             "access_token": token,
-            "token_type": "bearer",
-            "username": user_data["username"]
+            "username": user_data["username"],
+            "recents": response,
+            "message": "Login successful",
+            "success": True
         }
 
     except Exception as e:
@@ -108,11 +119,80 @@ async def get_products(request: Request, current_user: str = Depends(get_current
         user = await users_collection.find_one({"username": current_user})
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        products = user.get("recentSearches", [])
+        products = []
+        for search in user.get("recentSearches", []):
+            products.append({
+                "product_id": search.get("product_id"),
+                "url": search.get("url"),
+                "name": search.get("product_details", {}).get("name"),
+                "image": search.get("product_details", {}).get("image"),
+            })
         return {"products": products}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.delete("/delete")
+async def delete_product(request: Request, current_user: str = Depends(get_current_user)):
+    try:
+        data = await request.json()
+        if not data:
+            raise HTTPException(
+                status_code=400, detail="No input data provided")
+
+        product_id = data.get("product_id")
+        if not product_id:
+            raise HTTPException(
+                status_code=400, detail="Product ID is required")
+
+        users_collection = request.app.state.users_collection
+        user = await users_collection.find_one({"username": current_user})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        recent_searches = user.get("recentSearches", [])
+        updated_searches = [search for search in recent_searches if search.get(
+            "product_id") != product_id]
+
+        await users_collection.update_one(
+            {"username": current_user},
+            {"$set": {"recentSearches": updated_searches}},
+            upsert=True
+        )
+
+        return {"message": "Product deleted successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/product/{product_id}")
+async def get_product(request: Request, product_id: str, current_user: str = Depends(get_current_user)):
+    """Endpoint to get product details by product ID"""
+    try:
+        users_collection = request.app.state.users_collection
+        user = await users_collection.find_one({"username": current_user})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        response = {}
+        for recent_search in user.get("recentSearches", []):
+            if recent_search.get("product_id") == product_id:
+                response = {
+                    "product_id": recent_search["product_id"],
+                    "url": recent_search["url"],
+                    "product_details": recent_search["product_details"],
+                    "summary_details": recent_search["review_summary"],
+                    "sentiment_details": recent_search["sentiment_summary"],
+                }
+                return JSONResponse(content=response, status_code=200)
+        if not response:
+            return JSONResponse(content={"message": "Product not found","success": False})
+        raise HTTPException(
+            status_code=404, detail="Product not found in recent searches")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/search")
@@ -132,6 +212,23 @@ async def search(request: Request, current_user: str = Depends(get_current_user)
             product_id = match.group(1)
         else:
             raise HTTPException(status_code=400, detail="Invalid Amazon URL")
+
+        users_collection = request.app.state.users_collection
+        existing_user = await users_collection.find_one({"username": current_user})
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        for recent_search in existing_user.get("recentSearches", []):
+            if recent_search.get("product_id") == product_id:
+                response = {
+                    "product_id": recent_search["product_id"],
+                    "url": recent_search["url"],
+                    "product_details": recent_search["product_details"],
+                    "summary_details": recent_search["review_summary"],
+                    "sentiment_details": recent_search["sentiment_summary"],
+                }
+                return JSONResponse(content=response, status_code=200)
+
         if not url.startswith(("http://", "https://")):
             raise HTTPException(status_code=400, detail="Invalid URL format")
 
@@ -151,23 +248,31 @@ async def search(request: Request, current_user: str = Depends(get_current_user)
             review_summary=ReviewSummary(**response["summary_details"]),
             sentiment_summary=SentimentSummary(
                 **response["sentiment_details"]),
-            info_docs=[
-                Document(**doc) for doc in response.get("info_docs", [])
-            ]
+            info_docs=[Document(**doc)
+                       for doc in response.get("info_docs", [])]
         )
 
-        users_collection = request.app.state.users_collection
+        recent_searches = existing_user.get("recentSearches", [])
+        if len(recent_searches) >= int(os.getenv("MAX_RECENT_SEARCHES", 5)):
+            recent_searches.pop(0)
+
+        recent_searches.append(recent_search.model_dump())
+
         await users_collection.update_one(
             {"username": current_user},
-            {"$push": {"recentSearches": recent_search.model_dump()}},
+            {"$set": {"recentSearches": recent_searches}},
             upsert=True
         )
 
+        response.pop("info_docs", None)
         return JSONResponse(content=jsonable_encoder(response))
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
-    
+
+
 @app.post("/query")
 async def query(request: Request, current_user: str = Depends(get_current_user)):
     """Endpoint for querying the database"""
@@ -187,7 +292,6 @@ async def query(request: Request, current_user: str = Depends(get_current_user))
         if not query_response:
             raise HTTPException(status_code=404, detail="No response found")
         return JSONResponse(content=jsonable_encoder(query_response))
-        
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -196,3 +300,7 @@ async def query(request: Request, current_user: str = Depends(get_current_user))
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=5000, reload=True)
+    # to run, use the command:
+    # uvicorn app:app --host 0.0.0.0 --port 5000 --reload
+    # to run in production, use the command:
+    # uvicorn app:app --host

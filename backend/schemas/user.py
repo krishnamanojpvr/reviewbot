@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, List
 from datetime import datetime
 from werkzeug.security import generate_password_hash
@@ -51,10 +51,12 @@ class RecentSearch(BaseModel):
 class User(BaseModel):
     username: str
     password: str
-    recentSearches: Optional[List[dict]] = Field(default_factory=list, max_items=2) 
+    recentSearches: Optional[List[dict]] = Field(default_factory=list) 
 
     # Auto-hash password
     @field_validator("password")
     def hash_password(cls, v: str) -> str:
         """Automatically hash passwords before saving."""
         return generate_password_hash(v)
+    
+    
