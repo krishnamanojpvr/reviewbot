@@ -34,12 +34,12 @@ app.add_middleware(
 )
 
 
-@app.get("/health")
+@app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
 
 
-@app.post("/register")
+@app.post("/api/register")
 async def register(request: Request):
     try:
         data = await request.json()
@@ -66,7 +66,7 @@ async def register(request: Request):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/login")
+@app.post("/api/login")
 async def login(request: Request):
     try:
         data = await request.json()
@@ -104,7 +104,7 @@ async def login(request: Request):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.get("/protected")
+@app.get("/api/protected")
 async def protected_route(current_user: str = Depends(get_current_user)):
     return {
         "message": f"Hello {current_user}!",
@@ -112,7 +112,7 @@ async def protected_route(current_user: str = Depends(get_current_user)):
     }
 
 
-@app.get("/mysearches")
+@app.get("/api/mysearches")
 async def get_products(request: Request, current_user: str = Depends(get_current_user)):
     try:
         users_collection = request.app.state.users_collection
@@ -133,7 +133,7 @@ async def get_products(request: Request, current_user: str = Depends(get_current
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.delete("/delete")
+@app.delete("/api/delete")
 async def delete_product(request: Request, current_user: str = Depends(get_current_user)):
     try:
         data = await request.json()
@@ -167,7 +167,7 @@ async def delete_product(request: Request, current_user: str = Depends(get_curre
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.get("/product/{product_id}")
+@app.get("/api/product/{product_id}")
 async def get_product(request: Request, product_id: str, current_user: str = Depends(get_current_user)):
     """Endpoint to get product details by product ID"""
     try:
@@ -195,7 +195,7 @@ async def get_product(request: Request, product_id: str, current_user: str = Dep
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@app.post("/search")
+@app.post("/api/search")
 async def search(request: Request, current_user: str = Depends(get_current_user)):
     """Endpoint for product search and analysis"""
     try:
@@ -273,7 +273,7 @@ async def search(request: Request, current_user: str = Depends(get_current_user)
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@app.post("/query")
+@app.post("/api/query")
 async def query(request: Request, current_user: str = Depends(get_current_user)):
     """Endpoint for querying the database"""
     try:

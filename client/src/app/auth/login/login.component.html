@@ -1,0 +1,72 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black flex items-center justify-center p-6"
+>
+  <div
+    class="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl overflow-hidden w-full max-w-xl border border-gray-800"
+  >
+    <!-- Decorative Header -->
+    <div class="text-center py-8 px-10">
+      <!-- <div class="bg-gradient-to-r from-violet-900 via bg-gray-700 to-fuchsia-800 py-8 px-10"> -->
+      <h2 class="text-3xl font-bold text-white">Welcome Back</h2>
+      <p class="text-indigo-200 text-lg mt-1">Sign in to your account</p>
+    </div>
+
+    <div class="border-t border-violet-700"></div>
+    <!-- <p class="text-red-500 text-sm">Form Valid: {{ loginForm.valid }}</p> -->
+    <!-- Form -->
+    <div class="p-10">
+      <form class="space-y-8" (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <div>
+          <label class="block text-fuchsia-200 text-base font-medium mb-2"
+            >Username</label
+          >
+          <input
+            name="username"
+            type="text"
+            [(ngModel)]="username"
+            class="w-full px-5 py-4 rounded-xl border border-gray-700 bg-gray-900 text-fuchsia-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 focus:border-transparent transition text-lg"
+            placeholder="Enter Username"
+          />
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-fuchsia-200 text-base font-medium"
+              >Password</label
+            >
+            <a href="#" class="text-sm text-fuchsia-400 hover:text-fuchsia-300"
+              >Forgot?</a
+            >
+          </div>
+          <input
+            name="password"
+            type="password"
+            [(ngModel)]="password"
+            class="w-full px-5 py-4 rounded-xl border border-gray-700 bg-gray-900 text-fuchsia-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 focus:border-transparent transition text-lg"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loading || !loginForm.valid"
+          class="w-full py-4 px-5 bg-gradient-to-r from-violet-900 violet-gray-700 to-fuchsia-800 hover:from-indigo-700 hover:to-purple-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-fuchsia-900/40 transition duration-300 text-lg"
+        >
+          Sign In
+        </button>
+        <app-loader [isLoading]="loading"></app-loader>
+      </form>
+
+      <div class="mt-8 text-center">
+        <p class="text-base text-fuchsia-200">
+          Don't have an account?
+          <a
+            routerLink="/register"
+            class="font-medium text-fuchsia-400 hover:text-fuchsia-200"
+            >Sign up</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

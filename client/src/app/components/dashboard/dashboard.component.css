@@ -1,0 +1,32 @@
+/* Product card hover effect */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+/* Smooth transitions */
+.transition-transform {
+  transition-property: transform;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+/* Line clamping for product names */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Gradient overlay */
+.bg-gradient-to-t {
+  background-image: linear-gradient(to top, var(--tw-gradient-from), var(--tw-gradient-to));
+}
+
+.from-black\/70 {
+  --tw-gradient-from: rgba(0, 0, 0, 0.7);
+  --tw-gradient-to: rgba(0, 0, 0, 0);
+}

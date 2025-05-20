@@ -2,3 +2,6 @@
 __pycache__
 backup.py
 hf_cache
+node_modules
+
+.vscode

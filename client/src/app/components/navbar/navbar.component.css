@@ -1,0 +1,30 @@
+/* Smooth transitions for mobile menu */
+.md\:hidden {
+  transition: all 0.3s ease;
+}
+
+/* Ensure dropdown appears above other content */
+.z-50 {
+  z-index: 50;
+}
+
+/* Mobile menu animation */
+[aria-expanded="true"] ~ div {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Prevent body scrolling when mobile menu is open */
+body.mobile-menu-open {
+  overflow: hidden;
+}

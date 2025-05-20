@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Welcome Section -->
+    <div class="mb-10">
+      <h1 class="text-4xl font-bold text-fuchsia-200 mb-2">Welcome, {{ username }}!</h1>
+      <p class="text-gray-400">Your recent product searches</p>
+    </div>
+
+    <!-- Loading State -->
+    <app-loader *ngIf="loading"></app-loader>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="bg-red-900/30 border border-red-700 rounded-lg p-4 mb-6">
+      <p class="text-red-300">{{ error }}</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading && !error">
+      <!-- No Results State -->
+      <div *ngIf="products.length === 0" class="bg-gray-800/50 border border-gray-700 rounded-xl p-8 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="text-xl font-medium text-gray-300 mb-2">No recent searches found</h3>
+        <p class="text-gray-500">Your search history will appear here</p>
+      </div>
+
+      <!-- Results Grid -->
+      <div *ngIf="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let product of products; trackBy: trackByProductId" 
+             class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-fuchsia-500 transition-all duration-300 hover:shadow-lg hover:shadow-fuchsia-900/20 group">
+          <a [href]="product.url" target="_blank" class="block">
+            <div class="h-64 overflow-hidden flex items-center justify-center bg-gray-900 relative">
+              <img [src]="product.image" [alt]="product.name" 
+                   class="object-contain h-full transition-transform duration-300 group-hover:scale-105">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <span class="text-white text-sm font-medium">View on Amazon</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3 class="text-fuchsia-200 font-medium text-lg mb-2 line-clamp-2">{{ product.name }}</h3>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-400 text-sm">Product ID: {{ product.product_id }}</span>
+                <button class="text-fuchsia-400 hover:text-fuchsia-300 text-sm font-medium">
+                  Analyze
+                </button>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
