@@ -1,52 +1,139 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black p-6">
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black p-4 sm:p-6">
   <div class="max-w-7xl mx-auto">
-    <!-- Welcome Section -->
-    <div class="mb-10">
-      <h1 class="text-4xl font-bold text-fuchsia-200 mb-2">Welcome, {{ username }}!</h1>
-      <p class="text-gray-400">Your recent product searches</p>
+    <!-- Welcome Header -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-fuchsia-200 mb-1">Welcome, {{ username }}!</h1>
+        <p class="text-gray-400">Your recent product searches</p>
+      </div>
     </div>
 
-    <!-- Loading State -->
-    <app-loader *ngIf="loading"></app-loader>
+    <!-- Search Bar -->
+    <div class="mb-8 flex flex-col sm:flex-row gap-3 sm:items-center rounded-xl bg-gray-800/60 p-4 shadow-md border border-gray-700">
+      <input
+        [(ngModel)]="searchUrl"
+        type="text"
+        class="flex-1 px-4 py-3 rounded-lg border border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+        placeholder="Enter product URL"
+      />
+      <button
+        (click)="searchProduct()"
+        [disabled]="searchLoading"
+        class="min-w-[120px] bg-fuchsia-600 hover:bg-fuchsia-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
+      >
+        <ng-container *ngIf="!searchLoading">Search</ng-container>
+        <ng-container *ngIf="searchLoading">
+          <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+          </svg>
+          Searching...
+        </ng-container>
+      </button>
+    </div>
 
-    <!-- Error State -->
+    <!-- Loader -->
+    <app-loader [isLoading]="loading"></app-loader>
+
+    <!-- Error -->
     <div *ngIf="error && !loading" class="bg-red-900/30 border border-red-700 rounded-lg p-4 mb-6">
       <p class="text-red-300">{{ error }}</p>
     </div>
 
-    <!-- Products Grid -->
+    <!-- Products Section -->
     <div *ngIf="!loading && !error">
-      <!-- No Results State -->
-      <div *ngIf="products.length === 0" class="bg-gray-800/50 border border-gray-700 rounded-xl p-8 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <!-- No Searches -->
+      <div *ngIf="products.length === 0" class="bg-gray-800/60 border border-gray-700 rounded-xl p-10 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <h3 class="text-xl font-medium text-gray-300 mb-2">No recent searches found</h3>
         <p class="text-gray-500">Your search history will appear here</p>
       </div>
 
-      <!-- Results Grid -->
+      <!-- Product Grid -->
       <div *ngIf="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let product of products; trackBy: trackByProductId" 
-             class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-fuchsia-500 transition-all duration-300 hover:shadow-lg hover:shadow-fuchsia-900/20 group">
-          <a [href]="product.url" target="_blank" class="block">
-            <div class="h-64 overflow-hidden flex items-center justify-center bg-gray-900 relative">
-              <img [src]="product.image" [alt]="product.name" 
-                   class="object-contain h-full transition-transform duration-300 group-hover:scale-105">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <span class="text-white text-sm font-medium">View on Amazon</span>
-              </div>
-            </div>
-            <div class="p-4">
-              <h3 class="text-fuchsia-200 font-medium text-lg mb-2 line-clamp-2">{{ product.name }}</h3>
-              <div class="flex justify-between items-center">
-                <span class="text-gray-400 text-sm">Product ID: {{ product.product_id }}</span>
-                <button class="text-fuchsia-400 hover:text-fuchsia-300 text-sm font-medium">
-                  Analyze
+        <div
+          *ngFor="let product of products; trackBy: trackByProductId"
+          class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 hover:border-fuchsia-500 transition-all duration-300 group relative shadow-md hover:shadow-fuchsia-900/20"
+        >
+          <div class="relative">
+            <!-- Dropdown Toggle -->
+            <div class="absolute top-3 right-3 z-10">
+              <button
+                (click)="toggleDropdown(product.product_id, $event)"
+                #dropdownToggle
+                class="text-gray-400 hover:text-fuchsia-400 p-1 focus:outline-none"
+                type="button"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 font-bold" fill="currentColor" viewBox="0 0 20 20">
+                  <circle cx="10" cy="4" r="2" />
+                  <circle cx="10" cy="10" r="2" />
+                  <circle cx="10" cy="16" r="2" />
+                </svg>
+              </button>
+              <!-- Dropdown Menu -->
+              <div
+                *ngIf="dropdownOpen === product.product_id"
+                #dropdownMenu
+                class="absolute right-0 mt-2 w-32 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50"
+              >
+                <button
+                  (click)="openDeleteDialog(product.product_id)"
+                  class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-800"
+                >
+                  Delete
                 </button>
               </div>
             </div>
-          </a>
+            <!-- Product Image -->
+            <div [routerLink]="['/product', product.product_id]" class="cursor-pointer group block">
+              <img
+                [src]="product.image"
+                alt="Product Image"
+                class="w-full h-56 sm:h-64 object-cover rounded-t-xl border-b border-gray-700 group-hover:opacity-90 transition"
+              />
+            </div>
+          </div>
+          <div class="p-5 flex flex-col gap-2">
+            <!-- Product Title -->
+            <h3 class="text-fuchsia-200 font-semibold text-lg mb-1 line-clamp-2">{{ product.name }}</h3>
+            <!-- Product ID and Analyze Button -->
+            <div class="flex justify-between items-center mt-auto">
+              <span class="text-gray-400 text-xs">ID: {{ product.product_id }}</span>
+              <button
+                [routerLink]="['/product', product.product_id]"
+                class="text-fuchsia-400 hover:text-fuchsia-200 text-xs font-medium bg-gray-900/80 px-3 py-1 rounded-lg"
+              >
+                Analyze
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Delete Confirmation Dialog -->
+    <div
+      *ngIf="deleteDialogOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center "
+    >
+      <div class="bg-gray-900 rounded-xl p-8 border border-gray-700 w-full max-w-sm shadow-2xl flex flex-col items-center">
+        <div class="text-fuchsia-200 text-lg font-bold mb-4">Confirm Delete</div>
+        <p class="text-gray-300 mb-6 text-center">Are you sure you want to delete this search?</p>
+        <div class="flex gap-4">
+          <button
+            (click)="confirmDeleteProduct()"
+            class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold"
+          >
+            Delete
+          </button>
+          <button
+            (click)="closeDeleteDialog()"
+            class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-6 py-2 rounded-lg font-semibold"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>

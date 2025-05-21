@@ -83,19 +83,18 @@ async def login(request: Request):
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
         token = create_access_token(user_data["username"])
-        response = []
-        for search in user_data.get("recentSearches", []):
-            response.append({
-                "product_id": search.get("product_id"),
-                "url": search.get("url"),
-                "name": search.get("product_details", {}).get("name"),
-                "image": search.get("product_details", {}).get("image"),
-            })
+        # response = []
+        # for search in user_data.get("recentSearches", []):
+        #     response.append({
+        #         "product_id": search.get("product_id"),
+        #         "url": search.get("url"),
+        #         "name": search.get("product_details", {}).get("name"),
+        #         "image": search.get("product_details", {}).get("image"),
+            # })
 
         return {
             "access_token": token,
             "username": user_data["username"],
-            "recents": response,
             "message": "Login successful",
             "success": True
         }
@@ -222,10 +221,8 @@ async def search(request: Request, current_user: str = Depends(get_current_user)
             if recent_search.get("product_id") == product_id:
                 response = {
                     "product_id": recent_search["product_id"],
+                    "success": True,
                     "url": recent_search["url"],
-                    "product_details": recent_search["product_details"],
-                    "summary_details": recent_search["review_summary"],
-                    "sentiment_details": recent_search["sentiment_summary"],
                 }
                 return JSONResponse(content=response, status_code=200)
 
@@ -238,8 +235,7 @@ async def search(request: Request, current_user: str = Depends(get_current_user)
         if status_code != 200:
             return JSONResponse(content=response, status_code=status_code)
 
-        response["product_id"] = product_id
-        response["url"] = url
+        
 
         recent_search = RecentSearch(
             product_id=product_id,
@@ -264,7 +260,11 @@ async def search(request: Request, current_user: str = Depends(get_current_user)
             upsert=True
         )
 
-        response.pop("info_docs", None)
+        response = {
+            "product_id": product_id,
+            "url": url,
+            "success": True
+        }
         return JSONResponse(content=jsonable_encoder(response))
 
     except HTTPException:

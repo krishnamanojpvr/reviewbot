@@ -34,9 +34,7 @@
             <label class="block text-fuchsia-200 text-base font-medium"
               >Password</label
             >
-            <a href="#" class="text-sm text-fuchsia-400 hover:text-fuchsia-300"
-              >Forgot?</a
-            >
+           
           </div>
           <input
             name="password"
@@ -49,11 +47,14 @@
 
         <button
           type="submit"
-          [disabled]="loading || !loginForm.valid"
+          [disabled]="loading || !loginForm.valid  || error"
           class="w-full py-4 px-5 bg-gradient-to-r from-violet-900 violet-gray-700 to-fuchsia-800 hover:from-indigo-700 hover:to-purple-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-fuchsia-900/40 transition duration-300 text-lg"
         >
           Sign In
         </button>
+        <div *ngIf="error" class="mb-6 bg-red-900/30 border border-red-700 rounded-lg p-4">
+          <p class="text-red-300">{{ error }}</p>
+        </div>
         <app-loader [isLoading]="loading"></app-loader>
       </form>
 

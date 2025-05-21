@@ -1,6 +1,6 @@
+torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
 langchain
 transformers
-torch
 langchain-community
 langchain-huggingface
 faiss-cpu

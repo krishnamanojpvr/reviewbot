@@ -21,6 +21,7 @@
   overflow: hidden;
 }
 
+
 /* Gradient overlay */
 .bg-gradient-to-t {
   background-image: linear-gradient(to top, var(--tw-gradient-from), var(--tw-gradient-to));

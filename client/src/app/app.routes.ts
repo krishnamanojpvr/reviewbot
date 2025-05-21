@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { ProductComponent } from './components/product/product.component';
 import { AuthGuard } from './auth.guard';
 
 export const routes: Routes = [
@@ -14,6 +15,11 @@ export const routes: Routes = [
     path: 'dashboard', 
     component: DashboardComponent,
     canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'product/:id', 
+    component: ProductComponent ,
+    canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: '' }
 

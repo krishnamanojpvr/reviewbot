@@ -17,12 +17,19 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   loading: boolean = false;
+  error: string = '';
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private authService: AuthService
   ) {}
+
+  ngOnInit() {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
 
   onLogin() {
     if (!this.username || !this.password) return;
@@ -38,7 +45,8 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        alert('Login failed. Check your credentials.');
+        // alert('Login failed. Check your credentials.');
+        this.error = 'Login failed. Check your credentials.';
         this.loading = false;
       },
       complete: () => {
