@@ -60,7 +60,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   fetchMySearches() {
     this.loading = true;
     this.http
-      .get<any>('http://localhost:5000/api/mysearches', {
+      .get<any>('/api/mysearches', {
         headers: {
           Authorization: `Bearer ${this.authService.getToken()}`,
         },
@@ -85,7 +85,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     this.http
       .post<any>(
-        'http://localhost:5000/api/search',
+        '/api/search',
         { url: this.searchUrl },
         {
           headers: {
@@ -155,7 +155,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     if (!this.deleteTargetProductId) return;
     this.loading = true;
     this.http
-      .delete('http://localhost:5000/api/delete', {
+      .delete('/api/delete', {
         body: { product_id: this.deleteTargetProductId },
         headers: { Authorization: `Bearer ${this.authService.getToken()}` },
       })

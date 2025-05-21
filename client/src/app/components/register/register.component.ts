@@ -51,7 +51,7 @@ export class RegisterComponent {
       password: this.password
     };
 
-    this.http.post<any>('http://localhost:5000/api/register', registerData)
+    this.http.post<any>('/api/register', registerData)
       .subscribe({
         next: (response) => {
           if (response.success) {
