@@ -1,13 +1,42 @@
-FROM python:3.13-slim
+FROM python:3.13-slim AS build
 
 WORKDIR /app
 
-# Install system dependencies needed by Firefox (for Playwright)
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         gcc \
         python3-dev \
         wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH
+
+# Install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir playwright
+RUN playwright install --with-deps firefox
+
+# Copy requirements and install app dependencies
+COPY server/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY server/ .
+
+# Clean up pip cache
+RUN rm -rf /root/.cache/
+
+# Final stage - runtime image
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Install only runtime dependencies needed by Firefox/Playwright
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         libglib2.0-0 \
         libnss3 \
         libgdk-pixbuf2.0-0 \
@@ -28,15 +57,13 @@ RUN apt-get update && \
         libdrm2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Playwright and Firefox only
-RUN pip install --no-cache-dir playwright && \
-    playwright install --with-deps firefox
+# Copy virtual environment and application from build stage
+COPY --from=build /opt/venv /opt/venv
+COPY --from=build /app /app
 
-# Copy backend code
-COPY server/ .
+# Set PATH to use virtual environment
+ENV PATH=/opt/venv/bin:$PATH
 
-# Install app dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 5000
 
-# Start the FastAPI server
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]

@@ -83,7 +83,7 @@ export class ProductComponent implements OnInit, AfterViewChecked {
     this.chatInput = '';
     this.chatLoading = true;
 
-    this.http.post<any>('api/query', payload, {
+    this.http.post<any>('/api/query', payload, {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem('access_token')}`,
         'Content-Type': 'application/json'
