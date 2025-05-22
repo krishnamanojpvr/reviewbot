@@ -9,6 +9,7 @@ services:
       - "4200:80"
     depends_on:
       - server
+    restart: unless-stopped
 
   server:
     build:
@@ -18,3 +19,4 @@ services:
       - "5000:5000"
     env_file:
       - server/.env
+    restart: unless-stopped
