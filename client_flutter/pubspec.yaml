@@ -1,0 +1,31 @@
+name: client_flutter
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.4
+  shared_preferences: ^2.0.15
+  url_launcher: ^6.1.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/reviewbotlogo.png"
+
+  assets:
+    - assets/reviewbotlogo.png
+flutter:
+  uses-material-design: true
