@@ -10,7 +10,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await api.get('/api/products');
+        const response = await api.get('/api/mysearches');
         setProducts(response.data);
       } catch (err) {
         setError('Failed to load products');
