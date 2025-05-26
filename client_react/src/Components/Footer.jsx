@@ -1,0 +1,87 @@
+import { Link } from 'react-router-dom';
+
+const Footer = () => {
+  return (
+    <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-12 pb-6">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Company Info */}
+          <div className="md:col-span-2">
+            <h3 className="text-2xl font-bold mb-4 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              ReviewBot
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Advanced review analysis platform that helps businesses understand
+              customer feedback at scale.
+            </p>
+          </div>
+
+          {/* Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Product</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  to="#"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  Features
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm flex flex-col items-center gap-2">
+          <p>
+            Developed by <t></t>
+            <a
+              href="https://github.com/krishnamanojpvr/reviewbot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fuchsia-300 hover:text-fuchsia-100 font-semibold underline"
+            >
+              krishnamanojpvr
+            </a>
+          </p>
+          <a
+            href="https://github.com/krishnamanojpvr/reviewbot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-gray-400 hover:text-white transition"
+          >
+            <svg
+              className="w-6 h-6 mr-1"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.021c0 4.43 2.865 8.188 6.839 9.525.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.004.07 1.532 1.033 1.532 1.033.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.686-.103-.255-.447-1.276.098-2.659 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.748-1.026 2.748-1.026.547 1.383.203 2.404.1 2.659.64.699 1.028 1.593 1.028 2.686 0 3.847-2.339 4.695-4.566 4.944.36.309.682.92.682 1.857 0 1.34-.012 2.421-.012 2.751 0 .268.18.579.688.481C19.138 20.205 22 16.448 22 12.021 22 6.484 17.523 2 12 2z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
