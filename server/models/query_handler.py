@@ -7,6 +7,8 @@ from fastapi import HTTPException
 import logging
 from functools import lru_cache
 from models.embedding_processor import embed_query
+from openai import OpenAI
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,12 +16,13 @@ logger = logging.getLogger(__name__)
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 
+
 @lru_cache(maxsize=1)
 def get_inference_client():
-    return InferenceClient(
-        model="mistralai/Mistral-7B-Instruct-v0.3",
-        token=HF_TOKEN
-    )
+    return OpenAI(
+    base_url="https://router.huggingface.co/v1",
+    api_key=HF_API_KEY,
+)
 
 
 def similarity_search(user_query: str, info_docs: List[Dict[str, object]], k: int = 7) -> List[str]:
@@ -76,12 +79,14 @@ def generate_response(user_query: str, retrieved_docs: List[str]) -> str:
         """
 
         response = client.chat.completions.create(
+            model="mistralai/Mistral-7B-Instruct-v0.3:together",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=500,
             temperature=0.3
         )
-
-        return response.choices[0].message["content"]
+        # print(response.choices[0].message)
+        # print(response.choices[0].message.content)
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
         logger.error(f"Response generation error: {str(e)}", exc_info=True)

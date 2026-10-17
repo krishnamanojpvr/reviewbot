@@ -1,8 +1,9 @@
+# ---- Build Stage ----
 FROM python:3.13-slim AS build
 
 WORKDIR /app
 
-# Install build dependencies
+# Install build dependencies in one layer
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         gcc \
@@ -10,16 +11,21 @@ RUN apt-get update && \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Create virtual environment
+# Create and activate virtual environment
 RUN python -m venv /opt/venv
-ENV PATH=/opt/venv/bin:$PATH
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies
+# Upgrade pip and install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir playwright
-RUN playwright install --with-deps firefox
 
-# Copy requirements and install app dependencies
+# Install Playwright and Firefox dependencies
+RUN pip install --no-cache-dir playwright && \
+    playwright install --with-deps firefox
+
+# Install CPU version of torch
+RUN pip install --no-cache-dir torch --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Install app dependencies
 COPY server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -29,7 +35,7 @@ COPY server/ .
 # Clean up pip cache
 RUN rm -rf /root/.cache/
 
-# Final stage - runtime image
+# ---- Runtime Stage ----
 FROM python:3.13-slim
 
 WORKDIR /app
@@ -62,7 +68,7 @@ COPY --from=build /opt/venv /opt/venv
 COPY --from=build /app /app
 
 # Set PATH to use virtual environment
-ENV PATH=/opt/venv/bin:$PATH
+ENV PATH="/opt/venv/bin:$PATH"
 
 EXPOSE 5000
 

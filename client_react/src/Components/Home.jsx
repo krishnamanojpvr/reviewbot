@@ -25,7 +25,7 @@ const Home = () => {
           >
             Transform customer feedback into
             <span className="text-fuchsia-400 font-semibold">
-              actionable insights
+              <tab></tab> actionable insights <tab></tab>
             </span>
             with our AI-powered review analysis platform.
           </motion.p>

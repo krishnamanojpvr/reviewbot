@@ -1,4 +1,4 @@
-torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
+# torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
 langchain
 transformers
 langchain-community
@@ -14,3 +14,4 @@ python-jose
 python-dotenv
 fastapi
 uvicorn
+openai
